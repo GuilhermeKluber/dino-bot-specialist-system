@@ -7,8 +7,8 @@ import cv2
 import os
 
 
-def DinoManager():
-    def __init__:
+class DinoManager():
+    def __init__(self):
         self.initialize_dino()
         self.last_obstacle = {}
         self.last_speed = 0
@@ -17,7 +17,7 @@ def DinoManager():
     def obstacle(self,distance, length, speed, time,height,moviment = None):
         return { 'distance': distance, 'length': length, 'speed': speed, 'time': time,'height':height,"moviment": moviment }
 
-    def open_dino_website():
+    def open_dino_website(self):
         url = "https://chromedino.com/"
         webbrowser.open(url)
         time.sleep(3)
@@ -73,7 +73,7 @@ def DinoManager():
                     return dino_color
         return dino_color
 
-    def check_game_status():
+    def check_game_status(self):
         # TODO: Verify if game is over
 
     def get_obstacle_info(self,game_over):
