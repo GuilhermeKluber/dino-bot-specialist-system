@@ -1,16 +1,11 @@
-# Dino Machine Learning
+# Specialist System + Dino
 
-Dino Bot using Genectic Algorithm + Neural Network
+Dino Bot using specialist system (Durable rules)
 
 ## Run & Learn
 
-* Install dependencies: `pip install -r requirements.txt` and `pip install opencv-python`
-* For python 3.5
-* Open Browser and resize using Win+Left
-* Run the AI: `python ai.py`
-* Your browser must be offline
+* On progess
 
-# TOD
+# TODO
 
-* [] Make a condition to run with weights from best fitness on csv.
-* [] Open dino from chrome://dino to play.
+* everything
