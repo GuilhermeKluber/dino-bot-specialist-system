@@ -1,6 +1,18 @@
+from datetime import datetime
+import numpy as np
+import webbrowser
+import pyautogui
+import time
+import cv2
+import os
+
+
 def DinoManager():
     def __init__:
         self.initialize_dino()
+        self.last_obstacle = {}
+        self.last_speed = 0
+        self.lx,self.ly,self.rx,self.ry = lx,ly,rx,ry
 
     def obstacle(self,distance, length, speed, time,height,moviment = None):
         return { 'distance': distance, 'length': length, 'speed': speed, 'time': time,'height':height,"moviment": moviment }
@@ -11,6 +23,7 @@ def DinoManager():
         time.sleep(3)
 
     def initialize_dino(self):
+        #TODO: Validate that its working
         self.open_dino_website()
         try:
             lx, ly, w, h = pyautogui.locateOnScreen("./images/t_rex.png")
@@ -27,13 +40,12 @@ def DinoManager():
             raise Exception("Game not found!")
 
         ly, ry = ry, ly
-        # left, top, right, bottom, t_rex
-        image = pyautogui.screenshot(region=(lx,ly, rx-lx, ry-ly-10))
-        image = np.array(image)
         self.left, self.top, self.right, self.bottom = lx, ly, rx, ry
 
-    def find_next_obstacle(self,game_over):
-        dist,game_over,length,height = self.__next_obstacle_dist(game_over)
+    def get_game_info(self,game_over):
+        #TODO: Validate that its working
+        #TODO: Get speed, obstacle information and check game status
+        dist,game_over,length,height = self.get_obstacle_info(game_over)
         time = datetime.now()
         delta_dist = 0
         speed = self.last_speed
@@ -47,9 +59,9 @@ def DinoManager():
         self.last_obstacle = obstacle(dist, length, speed, time,height)
         return self.last_obstacle, game_over
 
-    def new_dino_color(self,image):
+    def get_dino_color(self,image):
         size = image.size
-        DinoColor = image.getpixel((size[0]-40,15))
+        dino_color = image.getpixel((size[0]-40,15))
         th = np.array(image)
         to_compare = image.getpixel((1,1))
         count=0
@@ -61,12 +73,17 @@ def DinoManager():
                     return dino_color
         return dino_color
 
+    def check_game_status():
+        # TODO: Verify if game is over
+
     def get_obstacle_info(self,game_over):
+        # TODO: Separe get obstacle information from game over check
+
         s = 0
         length = 0
         height=0
         image = pyautogui.screenshot(region=(self.lx,self.ly, self.rx-self.lx+160, self.ry-self.ly-10))
-        DinoColor = self.new_dino_color(image)
+        DinoColor = self.get_dino_color(image)
         size = image.size
         image = np.array(image)
         th = compare(image,DinoColor)
