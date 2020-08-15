@@ -1,17 +1,11 @@
 from modules.dino_manager import DinoManager
-from scanner import get_location
-
 
 def main():
-    generation = Generation()
-    lx,ly,rx,ry=get_location()
-    epoch= 0
-    while True:
-        epoch=epoch+1
-        print("Geracao {}".format(epoch))
-        generation.execute(lx,ly,rx,ry,epoch)
-        generation.keep_best_genomes()
-        generation.mutations()
+    dino_manager = DinoManager()
+
+    dino_manager.initialize_dino()
+    while 1:
+        dino_manager.get_game_info()
 
 if __name__ == '__main__':
     main()

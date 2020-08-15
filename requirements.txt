@@ -2,3 +2,6 @@ numpy
 pyautogui
 pillow
 keyboard
+opencv-python==3.4.11.39
+mss==6.0.0
+

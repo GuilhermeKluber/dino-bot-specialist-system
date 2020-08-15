@@ -1,18 +1,26 @@
 from datetime import datetime
+from functools import wraps
 import numpy as np
 import cv2
 import os
 import webbrowser
 import time
-import pyautogui
 
-def compare(img,col):
+def cronometra(function):
+    @wraps(function)
+    def wrapper(*args, **kwrds):
+        start = time.time()
+        ret = function(*args, **kwrds)
+        end = time.time() - start
+        print("This is the time that took for",
+              function.__name__, "to finish executing:", round(end,4))
+        return ret
+    return wrapper
+
+
+def binarize_image(img,col):
     im = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     diff=im
-    diff[im != col[0]] = 0
-    diff[im == col[0]] = 255
-    diff = diff.astype(np.uint8)
+    diff[im != col] = 0
+    diff[im == col] = 255
     return diff
-
-def obstacle(distance, length, speed, time,height,moviment = None):
-    return { 'distance': distance, 'length': length, 'speed': speed, 'time': time,'height':height,"moviment":moviment }
