@@ -74,7 +74,6 @@ class DinoManager():
 
     def grab_image(self, x,y,x2,y2):
         monitor = {'left': x, 'top': y, 'width': x2 - x, 'height': y2 - y}
-        # The simplest use, save a screen shot of the 1st monitor
         with mss() as sct:
             image = sct.grab(monitor)
             
