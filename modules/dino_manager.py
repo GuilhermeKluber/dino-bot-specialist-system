@@ -1,5 +1,6 @@
 from datetime import datetime
 from modules.utils import binarize_image, cronometra
+from modules.obstacle import Obstacle
 from mss import mss
 import numpy as np
 import webbrowser
@@ -12,25 +13,14 @@ import os
 
 class DinoManager():
     def __init__(self):
-        self.last_obstacle = None
-        self.last_speed = 0
-        self.display = True
+        self.last_obstacle = Obstacle(1,1,[999,0,999,999])
+        self.last_obstacle.in_game = False
+        self.last_speed = 1
         self.history_dino_color = collections.deque(maxlen=15)
         self.dino_color = 83
-
-    def obstacle(self,distance, length, speed, time,height,moviment = None):
-        return { 'distance': distance, 'length': length, 'speed': speed, 'time': time,'height':height,"moviment": moviment }
-
-    def show(self,image):
-        """
-        Show a image.
-        :param image: A image in array format 
-
-        """
-        if self.display : cv2.imshow("test",image)
-        while 1:
-            if cv2.waitKey(2) ==  27 or not self.display:
-                break
+        # self.t_rex_head = 420, 308, 454, 372
+        # self.game_x, self.game_y, self.game_x2, self.game_y2 = 450, 275, 972, 376
+        # self.last_game_image = self.grab_image(self.game_x, self.game_y, self.game_x2, self.game_y2)[:,:,0]
 
     def show_without_stop(self,window,image):
         """
@@ -38,10 +28,9 @@ class DinoManager():
         :param image: A image in array format 
 
         """
-        if self.display : 
-            cv2.imshow(window,image)
-            if cv2.waitKey(2) ==  27:
-                cv2.destroyAllWindows()
+        cv2.imshow(window,image)
+        if cv2.waitKey(2) ==  27:
+            cv2.destroyAllWindows()
 
     def open_dino_website(self):
         url = "https://chromedino.com/"
@@ -49,7 +38,6 @@ class DinoManager():
         time.sleep(3)
 
     def initialize_dino(self):
-        #TODO: Validate that its working
         self.open_dino_website()
         try:
             x, y, w, h = pyautogui.locateOnScreen("./images/t_rex.png")
@@ -77,10 +65,12 @@ class DinoManager():
         fix_x2 = (game_y2 - game_y)/0.21 - (game_x2 - game_x)
 
         self.t_rex_head = tx , ty-th, tx + tw, ty + th
-        self.x, self.y, self.x2, self.y2 = game_x + int(fix_x), game_y, game_x2 + int(fix_x2), game_y2 - 13 
+        self.game_x, self.game_y, self.game_x2, self.game_y2 = game_x + int(fix_x), game_y, game_x2 + int(fix_x2), game_y2 - 13 
         # o -13 é para remover o chão na hora de encontrar os objetos 
+        self.last_game_image = self.grab_image(self.game_x, self.game_y, self.game_x2, self.game_y2)[:,:,0]
 
-        print("LOG [INFO] Game Position ", self.x, self.y, self.x2, self.y2)
+        print("LOG [INFO] Position of 'T Rex Head' image ", tx , ty-th, tx + tw, ty + th)
+        print("LOG [INFO] Game Position ", self.game_x, self.game_y, self.game_x2, self.game_y2)
 
     def grab_image(self, x,y,x2,y2):
         monitor = {'left': x, 'top': y, 'width': x2 - x, 'height': y2 - y}
@@ -90,23 +80,17 @@ class DinoManager():
             
         img = np.array(image)
         return img
-
+        
+    @cronometra
     def get_game_info(self):
-        #TODO: Validate that its working
-        #TODO: Get speed, obstacle information and check game status
-        dist, length, height = self.get_obstacle_info()
+        obstacle = self.get_obstacle_info()
 
-        time = datetime.now()
-        delta_dist = 0
-        speed = self.last_speed
-        if self.last_obstacle:
-            delta_dist = self.last_obstacle['distance'] - dist
-            speed = (delta_dist / ((time - self.last_obstacle['time']).microseconds)) * 10000
-            if not (speed/10 > 0.1 and speed/10 < 1):
-                speed = self.last_speed
-            else:
-                self.last_speed = speed
-        self.last_obstacle = self.obstacle(dist, length, speed, time,height)
+        if obstacle and obstacle.distance > 0:
+            obstacle.calculate_speed(self.last_obstacle)
+            self.last_speed = obstacle.speed
+            self.last_obstacle = obstacle
+        else:
+            self.last_obstacle.in_game = False
         return self.last_obstacle
 
     def get_dino_color(self,image):
@@ -119,10 +103,6 @@ class DinoManager():
             self.history_dino_color.append(res[0][0])
         self.dino_color = collections.Counter(self.history_dino_color).most_common()[0][0]
 
-    def is_land_or_air(self):
-        # TODO: Verify if object is land or air
-        pass
-
     def join_objects(self, objects, threshold):
         accepted_rects = []
 
@@ -131,44 +111,26 @@ class DinoManager():
         for idx, bbox in enumerate(objects):
             if (objects_used[idx] == False):
 
-                # Initialize current rect
-                x = bbox[0]
-                x2 = bbox[0] + bbox[2]
-                y = bbox[1]
-                y2 = bbox[1] + bbox[3]
-
-                # This bounding rect is used
+                x, x2, y, y2 = bbox[0], bbox[0] + bbox[2], bbox[1], bbox[1] + bbox[3]
                 objects[idx] = True
-
-                # Iterate all initial bounding rects
-                # starting from the next
                 for sub_idx, sub_bbox in enumerate(objects[(idx+1):], start = (idx+1)):
+                    xx, xx2, yy, yy2 = sub_bbox[0], sub_bbox[0] + sub_bbox[2], sub_bbox[1], sub_bbox[1] + sub_bbox[3]
 
-                    # Initialize merge candidate
-                    xx = sub_bbox[0]
-                    xx2 = sub_bbox[0] + sub_bbox[2]
-                    yy = sub_bbox[1]
-                    yy2 = sub_bbox[1] + sub_bbox[3]
-
-                    # Check if x distance between current rect
-                    # and merge candidate is small enough
                     if (xx <= x2 + threshold):
-
-                        # Reset coordinates of current rect
-                        x2 = xx2
-                        y = min(y, yy)
-                        y2 = max(y2, yy2)
-
-                        # Merge candidate (bounding rect) is used
+                        x2, y, y2 = xx2, min(y, yy), max(y2, yy2)
                         objects_used[sub_idx] = True
                     else:
                         break
-
-                # No more merge candidates possible, accept current rect
-                accepted_rects.append([x, y, x2 - x, y2 - y])
+                accepted_rects.append([x, y, x2, y2 ])
         return accepted_rects
 
-    @cronometra
+    def check_if_game_is_over(self,actual_image, last_image):
+        res = np.sum((actual_image - last_image))
+        if res != 0:
+            return False
+        return True
+
+    # @cronometra
     def get_obstacle_info(self):
         # TODO: Separe get obstacle information from game over check
 
@@ -176,33 +138,37 @@ class DinoManager():
         length = 0
         height=0
 
-        game_image = self.grab_image(self.x, self.y, self.x2, self.y2) 
+        game_image = self.grab_image(self.game_x, self.game_y, self.game_x2, self.game_y2) 
         t_rex_image = self.grab_image(*self.t_rex_head) 
 
         dino_color = self.get_dino_color(t_rex_image[:,:,0])
         size = game_image.shape
         
-        th = binarize_image(game_image,self.dino_color)
-        x_aux=1000000
-        count=1
+        binarized_image = binarize_image(game_image,self.dino_color)
+        self.last_game_image = binarized_image.copy()
 
-        self.show_without_stop("head",t_rex_image[:,:,0])
-        self.show_without_stop("game",th)
-        # self.show_without_stop(th)
-        objects = []
-        _, contours, _= cv2.findContours(th,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) > 1:
+        obstacles = []
+        _, contours, _= cv2.findContours(binarized_image,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        if len(contours) > 0:
             for c in contours:
                 x,y,w,h = cv2.boundingRect(c)
                 if w > 3 and h >3:
-                    objects.append([x,y,w,h])
-        print(objects)
-        objects = self.join_objects(objects, 10)
-        print(objects)
-        return (x_aux-70), length*count, height
+                    
+                    obstacles.append([x,y,w,h])
 
-        # return 286,0, 0
 
-    def reset(self):
-        self.last_obstacle = {}
-        self.last_speed = 0
+        to_show = cv2.cvtColor(binarized_image,cv2.COLOR_GRAY2BGR)
+        obstacles = self.join_objects(obstacles, 10)
+        for x,y,x2,y2 in obstacles:
+            cv2.rectangle(to_show, (x,y), (x2,y2), (0,255,0),1)
+
+        self.show_without_stop("T-Rex",t_rex_image[:,:,0])
+        self.show_without_stop("Game",to_show)
+
+        if len(obstacles) > 0:
+            next_obstacle = Obstacle(self.last_speed, self.game_y2 - self.game_y, obstacles[0])
+            return next_obstacle
+        else:
+            return None
+
+
