@@ -39,6 +39,7 @@ class DinoManager():
 
     def initialize_dino(self):
         self.open_dino_website()
+        time.sleep(2)
         try:
             x, y, w, h = pyautogui.locateOnScreen("./images/t_rex.png")
             game_x = x + w
@@ -80,7 +81,7 @@ class DinoManager():
         img = np.array(image)
         return img
         
-    @cronometra
+    # @cronometra
     def get_game_info(self):
         obstacle = self.get_obstacle_info()
 
@@ -161,8 +162,8 @@ class DinoManager():
         for x,y,x2,y2 in obstacles:
             cv2.rectangle(to_show, (x,y), (x2,y2), (0,255,0),1)
 
-        self.show_without_stop("T-Rex",t_rex_image[:,:,0])
-        self.show_without_stop("Game",to_show)
+        # self.show_without_stop("T-Rex",t_rex_image[:,:,0])
+        # self.show_without_stop("Game",to_show)
 
         if len(obstacles) > 0:
             next_obstacle = Obstacle(self.last_speed, self.game_y2 - self.game_y, obstacles[0])
