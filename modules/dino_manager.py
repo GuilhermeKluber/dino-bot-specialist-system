@@ -124,8 +124,9 @@ class DinoManager():
                 accepted_rects.append([x, y, x2, y2 ])
         return accepted_rects
 
-    def check_if_game_is_over(self,actual_image, last_image):
+    def check_if_game_is_over(self, actual_image, last_image):
         res = np.sum((actual_image - last_image))
+        print(res)
         if res != 0:
             return False
         return True
@@ -145,6 +146,8 @@ class DinoManager():
         size = game_image.shape
         
         binarized_image = binarize_image(game_image,self.dino_color)
+        # if self.check_if_game_is_over(self.last_game_image, binarized_image):
+        #     return None
         self.last_game_image = binarized_image.copy()
 
         obstacles = []
