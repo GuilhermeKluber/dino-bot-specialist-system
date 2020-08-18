@@ -1,4 +1,4 @@
-.vs_code/*
-.vscode/*
-*.ipynb_checkpoints/
-/__pycache__/
+.vs_code/
+.vscode/
+**/.ipynb_checkpoints/
+**/__pycache__/
