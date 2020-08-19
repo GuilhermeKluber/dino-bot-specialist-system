@@ -18,6 +18,7 @@ class DinoManager():
         self.last_speed = 1
         self.history_dino_color = collections.deque(maxlen=15)
         self.dino_color = 83
+        self.game_over = collections.deque(maxlen=25)
         # self.t_rex_head = 420, 308, 454, 372
         # self.game_x, self.game_y, self.game_x2, self.game_y2 = 450, 275, 972, 376
         # self.last_game_image = self.grab_image(self.game_x, self.game_y, self.game_x2, self.game_y2)[:,:,0]
@@ -42,17 +43,19 @@ class DinoManager():
         time.sleep(2)
         try:
             x, y, w, h = pyautogui.locateOnScreen("./images/t_rex.png")
+            # x, y, w, h = 377,343,47,50 # SET by GREG
             game_x = x + w
             game_y2 = y + h
             print("LOG [INFO] Position of 'T Rex' image ", x, y, w, h)
             pyautogui.press("space")
             time.sleep(2)
             tx, ty, tw, th = pyautogui.locateOnScreen("./images/t_rex_head.png")
-
+            # tx, ty, tw, th = 377,343,47,50 # SET by GREG
             print("LOG [INFO] Position of 'T Rex Head' image ", x, y, w, h)
 
             time.sleep(8)
             x, y, w, h = pyautogui.locateOnScreen("./images/hi.png")
+            # x, y, w, h = 804,257,32,22 # SET by GREG
             print("LOG [INFO] Position of 'HI' (high score) image ", x, y, w, h)
             game_x2 = x
             game_y = y + h
@@ -76,9 +79,8 @@ class DinoManager():
     def grab_image(self, x,y,x2,y2):
         monitor = {'left': x, 'top': y, 'width': x2 - x, 'height': y2 - y}
         with mss() as sct:
-            image = sct.grab(monitor)
-            
-        img = np.array(image)
+            image = sct.grab(monitor);
+        img = np.array(image);
         return img
         
     # @cronometra
@@ -126,15 +128,14 @@ class DinoManager():
 
     def check_if_game_is_over(self, actual_image, last_image):
         res = np.sum((actual_image - last_image))
-        print(res)
-        if res != 0:
-            return False
-        return True
+        status_game = False
+        if res == 0:
+            status_game=True
+        self.game_over.append(status_game)
 
     # @cronometra
     def get_obstacle_info(self):
         # TODO: Separe get obstacle information from game over check
-
         s = 0
         length = 0
         height=0
@@ -146,8 +147,9 @@ class DinoManager():
         size = game_image.shape
         
         binarized_image = binarize_image(game_image,self.dino_color)
-        # if self.check_if_game_is_over(self.last_game_image, binarized_image):
-        #     return None
+
+        self.check_if_game_is_over(self.last_game_image, binarized_image)
+
         self.last_game_image = binarized_image.copy()
 
         obstacles = []
