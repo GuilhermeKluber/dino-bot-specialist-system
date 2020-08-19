@@ -14,7 +14,7 @@ def main():
 
     # Auto
     pyautogui.press('SPACE',interval=0.135)
-    time.sleep(2)
+    time.sleep(3)
     # Manually
     # print('PRESS SPACE ON DINO GAME, you have 5 seconds to start process...')
     # time.sleep(5)
@@ -24,13 +24,14 @@ def main():
         
         game_status = list(dino_manager.game_over)
         if len(game_status)==25 and all(game_status)==True:
-            # raise Exception('GAME OVER')
-            print('LOG[INFO] GAME OVER')
-            dino_manager.game_over.clear()
-            time.sleep(2)
-            pyautogui.press('SPACE',interval=0.135)
-            time_start = time.time()
-            print('LOG[INFO] GAME RESTART')
+            raise Exception('GAME OVER')
+            # print('LOG[INFO] GAME OVER')
+            # dino_manager.game_over.clear()
+            # time.sleep(2)
+            # pyautogui.press('SPACE',interval=0.135)
+            # time_start = time.time()
+            # print('LOG[INFO] GAME RESTART')
+            # time.sleep(2)
 
         if obstacle.in_game: 
 
@@ -43,7 +44,7 @@ def main():
                     "timeElapsed": time_elapsed,
                     "type": obstacle.type
                     }
-            print(data)
+            # print(data)
             try:
                 post('Action', data)
             except Exception as e:
