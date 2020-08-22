@@ -1,10 +1,10 @@
-from datetime import datetime
-from functools import wraps
-import numpy as np
-import cv2
 import os
-import webbrowser
+import cv2
 import time
+import webbrowser
+import numpy as np
+from functools import wraps
+from datetime import datetime
 
 def cronometra(function):
     @wraps(function)
