@@ -2,11 +2,12 @@
 
 Dino Bot using specialist system (Durable rules)
 
-## Run & Learn
+# Running
 
-* On progess
-* sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0
+#### Environment
+    conda create -n dino python=3.7
+    source activate dino
+    pip install -r requirements.txt
 
-# TODO
-
-* everything
+### Run
+    python main.py
