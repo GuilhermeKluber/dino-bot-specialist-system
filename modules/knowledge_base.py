@@ -17,7 +17,7 @@ with ruleset('Action'):
               (m.type=="land"))
     def jump_one_small_cactus1(c):
         custom_print(inspect.stack()[0][3], c)
-        key_board.press_space_super_ultra_very_fast()
+        key_board.press_space_ultra_very_fast()
 
     # 1 small cactus time between 15s  30s
     @when_all((m.length>=15)&(m.length<=23)&
@@ -47,7 +47,7 @@ with ruleset('Action'):
               (m.type=="land"))
     def jump_one_small_cactus4(c):
         custom_print(inspect.stack()[0][3], c)
-        key_board.press_space_ultra_very_fast()
+        key_board.press_space_ultra_fast()
 
     # 1 small cactus time between 60s 90s
     @when_all((m.length>=15)&(m.length<=23)&
