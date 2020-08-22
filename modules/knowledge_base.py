@@ -3,9 +3,6 @@ import pyautogui
 from durable.lang import ruleset, when_all, m
 from modules.keyboard_action import KeyboardAction
 
-# TODO: map more rules, HI of dino 1002
-# TODO: sometimes the rule is applied twice
-
 key_board = KeyboardAction()
 
 def custom_print(function_desc, conds):
@@ -14,19 +11,18 @@ def custom_print(function_desc, conds):
 with ruleset('Action'):
     # 1 small cactus time < 15s
     @when_all((m.length>=15)&(m.length<=23)&
-              (m.height>=19)&(m.height<=26)&
-              (m.distance>=0)&(m.distance<=95)&
+              (m.height>=19)&(m.height<=26)& 
+              (m.distance>=0)&(m.distance<=80)&
               (m.timeElapsed>=0)&(m.timeElapsed<=15)&
               (m.type=="land"))
     def jump_one_small_cactus1(c):
         custom_print(inspect.stack()[0][3], c)
-        key_board.press_space_ultra_fast()
-
+        key_board.press_space_super_ultra_very_fast()
 
     # 1 small cactus time between 15s  30s
     @when_all((m.length>=15)&(m.length<=23)&
               (m.height>=19)&(m.height<=26)&
-              (m.distance>=0)&(m.distance<=100)&
+              (m.distance>=0)&(m.distance<=95)&
               (m.timeElapsed>=15)&(m.timeElapsed<=30)&
               (m.type=="land"))
     def jump_one_small_cactus2(c):
@@ -146,12 +142,22 @@ with ruleset('Action'):
     # 1 big cactus 0s 30s
     @when_all((m.length>=20)&(m.length<=25)&
               (m.height>=35)&(m.height<=40)&
-              (m.distance>=0)&(m.distance<=75)&
-              (m.timeElapsed>=0)&(m.timeElapsed<=30)&
+              (m.distance>=0)&(m.distance<=85)&
+              (m.timeElapsed>=0)&(m.timeElapsed<15)&
+              (m.type=="land"))
+    def jump_one_big_cactus0(c):
+        custom_print(inspect.stack()[0][3], c)
+        key_board.press_space_fast()
+
+    # 1 big cactus 0s 30s
+    @when_all((m.length>=20)&(m.length<=25)&
+              (m.height>=35)&(m.height<=40)&
+              (m.distance>=0)&(m.distance<=100)&
+              (m.timeElapsed>=15)&(m.timeElapsed<=30)&
               (m.type=="land"))
     def jump_one_big_cactus1(c):
         custom_print(inspect.stack()[0][3], c)
-        key_board.press_space_ultra_fast()
+        key_board.press_space_fast()
 
     # 1 big cactus 30s 120s
     @when_all((m.length>=20)&(m.length<=25)&
@@ -206,7 +212,7 @@ with ruleset('Action'):
     # 3 big cactus 0s 50s
     @when_all((m.length>=68)&(m.length<=75)&
               (m.height>=35)&(m.height<=40)&
-              (m.distance>=0)&(m.distance<=120)&
+              (m.distance>=0)&(m.distance<=110)&
               (m.timeElapsed>=0)&(m.timeElapsed<=50)&
               (m.type=="land"))
     def jump_tree_big_cactus1(c):
@@ -234,7 +240,7 @@ with ruleset('Action'):
         key_board.press_space_fast()
     
     # bird in air
-    @when_all((m.distance<100)&
+    @when_all((m.distance>=0)&(m.distance<=100)&
               (m.type=="air"))
     def down_bird(c):
         custom_print(inspect.stack()[0][3], c)
@@ -249,10 +255,3 @@ with ruleset('Action'):
     def jump_bird(c):
         custom_print(inspect.stack()[0][3], c)
         key_board.press_space_fast()
-
-    # # General Rule
-    # @when_all((m.distance<100)&
-    #           (m.type=="land"))
-    # def jump_general(c):
-    #     custom_print(inspect.stack()[0][3], c)
-    #     key_board.press_space()

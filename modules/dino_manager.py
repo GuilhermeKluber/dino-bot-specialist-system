@@ -1,15 +1,14 @@
+import os
+import cv2
+import time
+import pyautogui
+import webbrowser
+import numpy as np
+import collections
+from mss import mss
 from datetime import datetime
 from modules.utils import binarize_image, cronometra
 from modules.obstacle import Obstacle
-from mss import mss
-import numpy as np
-import webbrowser
-import collections
-import pyautogui
-import time
-import cv2
-import os
-
 
 class DinoManager():
     def __init__(self):
@@ -36,7 +35,7 @@ class DinoManager():
     def open_dino_website(self):
         url = "https://chromedino.com/"
         webbrowser.open(url)
-        time.sleep(3)
+        time.sleep(5)
 
     def initialize_dino(self):
         self.open_dino_website()

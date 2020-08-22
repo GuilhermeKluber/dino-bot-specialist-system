@@ -44,7 +44,7 @@ def main():
                     "timeElapsed": time_elapsed,
                     "type": obstacle.type
                     }
-            # print(data)
+
             try:
                 post('Action', data)
             except Exception as e:
